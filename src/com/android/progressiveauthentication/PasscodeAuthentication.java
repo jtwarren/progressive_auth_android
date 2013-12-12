@@ -46,6 +46,9 @@ public class PasscodeAuthentication extends Activity {
 				setResult(Activity.RESULT_OK, resultantIntent);
 				if (r) {
 					Log.i(ERROR_TAG, "Passed password check!");
+          Intent resultIntent = new Intent();
+          resultIntent.putExtra("auth", true);
+          setResult(Activity.RESULT_OK, resultIntent);
 				}
 				else {
 					Log.i(ERROR_TAG, "Failed password check!");
