@@ -1,6 +1,5 @@
 package com.android.progressiveauthentication;
 
-import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -11,6 +10,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -57,6 +57,7 @@ public class SetPasswordActivity extends Activity {
 			        // Generate a random salt of length 20
 			        byte[] salt = new byte[SALT_LENGTH];
 			        new Random().nextBytes(salt);
+			        salt = stringToByteArr(byteArrToString(salt));
 			        String gen = null;
 			        
 					try {
@@ -72,9 +73,10 @@ public class SetPasswordActivity extends Activity {
 					}
 
 			        SharedPreferences.Editor editor = prefs.edit();
+			        
 			        editor.putString(AUTH_TYPE, gen);
-			        editor.putInt(AUTH_TYPE + "_SALT", byteArrToInt(salt));
-			        editor.commit();;
+			        editor.putString(AUTH_TYPE + "_SALT", byteArrToString(salt));
+			        editor.commit();
 					finish();
 				}
 			}
@@ -83,6 +85,11 @@ public class SetPasswordActivity extends Activity {
 
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	Log.e("PROG_AUTH", data.toString());
+    }
+    
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.progressive_authetication, menu);
@@ -90,7 +97,7 @@ public class SetPasswordActivity extends Activity {
     }
     
     // Cryptographic hashing with salt
-	private static String generateKey(char[] pwd, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private static String generateKey(char[] pwd, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
         final int iterations = 1000; 
 
         // Generate a 256-bit key
@@ -101,21 +108,20 @@ public class SetPasswordActivity extends Activity {
         SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
         // Convert to a string for storage while maintaining consistency
         String result = Base64.encodeToString(secretKey.getEncoded(), Base64.DEFAULT);
-        Log.i(ERROR_TAG, "Generated this key result: " + result);
         return result;
     }
     
-    public static int byteArrToInt(byte[] b) {
-    	ByteBuffer wrapped = ByteBuffer.wrap(b);
-    	int i = wrapped.getInt();
-    	return i;
+	// Will encode byteArray to String
+	public static String byteArrToString(byte[] b) {
+		String str = null;
+		str = new String(b);
+    	return str;
     }
     
-    public static byte[] intToByteArr(int i) {
-    	ByteBuffer dbuf = ByteBuffer.allocate(SALT_LENGTH);
-    	dbuf.putInt(i);
-    	byte[] bytes = dbuf.array();
+	// Will decode String to byteArray
+    public static byte[] stringToByteArr(String s) {
+    	byte[] bytes = null;
+		bytes = s.getBytes();
     	return bytes;
     }
-
 }
