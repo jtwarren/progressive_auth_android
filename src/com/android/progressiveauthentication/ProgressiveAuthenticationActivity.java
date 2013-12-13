@@ -21,6 +21,8 @@ import android.os.ServiceManager;
 import android.content.Intent;
 import android.content.ServiceConnection;
 
+import android.widget.Toast;
+
 
 
 public class ProgressiveAuthenticationActivity extends Activity {
@@ -54,6 +56,13 @@ public class ProgressiveAuthenticationActivity extends Activity {
 
         handleAuthentication();
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+
+        this.finish();
     }
 
 
@@ -99,6 +108,9 @@ public class ProgressiveAuthenticationActivity extends Activity {
                     }
 
 
+                  } else {
+                      Toast toast = Toast.makeText(getApplicationContext(), "Incorrect, try again", Toast.LENGTH_LONG);
+                      toast.show();
                   }
               handleAuthentication();
               }
@@ -116,6 +128,9 @@ public class ProgressiveAuthenticationActivity extends Activity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Incorrect, try again", Toast.LENGTH_LONG);
+                    toast.show();
                 }
                 handleAuthentication();
               }
