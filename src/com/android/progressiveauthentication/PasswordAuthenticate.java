@@ -4,23 +4,26 @@ import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.Random;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class PasswordAuthenticate extends Activity {
 	
@@ -33,6 +36,8 @@ public class PasswordAuthenticate extends Activity {
 	public static final String HARD_CODED_PWD = "pass";
 	public static final int SALT_LENGTH = 20;
 
+	public static int test_counter = 0;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -73,6 +78,16 @@ public class PasswordAuthenticate extends Activity {
 				EditText password = (EditText) findViewById(R.id.editText1);
 				if (password == null) {
 					Log.e(ERROR_TAG, "Pw field is null");
+				} else {
+					readFromCursor();
+//					  test_counter += 1;
+//				      ContentValues values = new ContentValues();
+//				      values.put(AuthTable.COLUMN_PACKAGE, "test.package.name"+test_counter);
+//		     	      values.put(AuthTable.COLUMN_LEVEL, test_counter);
+//		     	      Log.e("CONTENT",AuthProvider.CONTENT_URI.toString());
+//		     	      Uri uri = getContentResolver().insert(AuthProvider.CONTENT_URI, values);
+//		     	      Log.e("CONTENT","GOT Content Resolver");
+//		     	      Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
 				}
 				Log.i(ERROR_TAG, "Pw field has this: " + password.getEditableText().toString());
 				boolean res = verifyPassword(password.getEditableText().toString());
@@ -83,12 +98,12 @@ public class PasswordAuthenticate extends Activity {
 					Log.i(ERROR_TAG, "Passed password check!");
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra("auth", true);
-                    setResult(Activity.RESULT_OK, resultIntent);
+//                    setResult(Activity.RESULT_OK, resultIntent);
 				}
 				else {
 					Log.i(ERROR_TAG, "Failed password check!");
 				}
-				finish();
+//				finish();
 			}
 		});
     }
@@ -133,6 +148,24 @@ public class PasswordAuthenticate extends Activity {
     	}
     	return false;
     }
+    
+    public void readFromCursor() {
+        // Retrieve student records
+        Uri auth = AuthProvider.CONTENT_URI;
+        Cursor c = managedQuery(auth, null, null, null, null);
+        if (c.moveToFirst()) {
+           do{
+        	  Log.e("CONTENT",  c.getString(c.getColumnIndex(AuthTable.COLUMN_ID)) + 
+              ", " +  c.getString(c.getColumnIndex( AuthTable.COLUMN_PACKAGE)) + 
+              ", " + c.getString(c.getColumnIndex( AuthTable.COLUMN_LEVEL)));
+              Toast.makeText(this, 
+              c.getString(c.getColumnIndex(AuthTable.COLUMN_ID)) + 
+              ", " +  c.getString(c.getColumnIndex( AuthTable.COLUMN_PACKAGE)) + 
+              ", " + c.getString(c.getColumnIndex( AuthTable.COLUMN_LEVEL)), 
+              Toast.LENGTH_SHORT).show();
+           } while (c.moveToNext());
+        }
+     }
     
     // Cryptographic hashing with salt
 	private static String generateKey(char[] pwd, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
