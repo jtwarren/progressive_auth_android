@@ -1,6 +1,5 @@
 package com.android.progressiveauthentication;
 
-import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -56,6 +55,7 @@ public class SetPasscodeActivity extends Activity {
 			        // Generate a random salt of length 20
 			        byte[] salt = new byte[SALT_LENGTH];
 			        new Random().nextBytes(salt);
+			        salt = stringToByteArr(byteArrToString(salt));
 			        String gen = null;
 			        
 					try {
@@ -73,8 +73,9 @@ public class SetPasscodeActivity extends Activity {
 
 			        SharedPreferences.Editor editor = prefs.edit();
 			        editor.putString(AUTH_TYPE, gen);
-			        editor.putInt(AUTH_TYPE + "_SALT", byteArrToInt(salt));
-			        editor.commit();;
+			        editor.putString(AUTH_TYPE + "_SALT", byteArrToString(salt));
+			        editor.commit();
+			        
 					finish();
 				}
 			}
@@ -90,7 +91,7 @@ public class SetPasscodeActivity extends Activity {
     }
     
     // Cryptographic hashing with salt
-	private static String generateKey(char[] pwd, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private static String generateKey(char[] pwd, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
         final int iterations = 1000; 
 
         // Generate a 256-bit key
@@ -101,21 +102,20 @@ public class SetPasscodeActivity extends Activity {
         SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
         // Convert to a string for storage while maintaining consistency
         String result = Base64.encodeToString(secretKey.getEncoded(), Base64.DEFAULT);
-        Log.i(ERROR_TAG, "Generated this key result: " + result);
         return result;
     }
     
-    public static int byteArrToInt(byte[] b) {
-    	ByteBuffer wrapped = ByteBuffer.wrap(b);
-    	int i = wrapped.getInt();
-    	return i;
+	// Will encode byteArray to String
+	public static String byteArrToString(byte[] b) {
+		String str = null;
+		str = new String(b);
+    	return str;
     }
     
-    public static byte[] intToByteArr(int i) {
-    	ByteBuffer dbuf = ByteBuffer.allocate(SALT_LENGTH);
-    	dbuf.putInt(i);
-    	byte[] bytes = dbuf.array();
+	// Will decode String to byteArray
+    public static byte[] stringToByteArr(String s) {
+    	byte[] bytes = null;
+		bytes = s.getBytes();
     	return bytes;
     }
-
 }

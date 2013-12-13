@@ -1,10 +1,8 @@
 package com.android.progressiveauthentication;
 
-import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.Random;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -28,7 +26,7 @@ public class PasswordAuthenticate extends Activity {
     public static final String AUTH_TYPE = "Password";
     public static final String SALT = "Salt";
     public static final String ERROR_TAG = "PASSWORD";
-    public static final String IDENTIFIER = "com.example.passwordauth";
+    public static final String IDENTIFIER = "com.android.progressiveauthentication";
     public static final String HASH_ALGO = "PBKDF2WithHmacSHA1";
     public static final String HARD_CODED_PWD = "pass";
     public static final int SALT_LENGTH = 20;
@@ -42,29 +40,7 @@ public class PasswordAuthenticate extends Activity {
         setContentView(R.layout.activity_password_authenticate);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         final Button enterButton = (Button) findViewById(R.id.button1);
-        // Generate a random salt of length 20
-        // byte[] b = new byte[SALT_LENGTH];
-        // new Random().nextBytes(b);
-        String gen = HARD_CODED_PWD;
-        /*
-        try {
-            gen = generateKey(HARD_CODED_PWD.toCharArray(), b);
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            gen = "";
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            gen = "";
-        }
-        */
-        
-        // String gen = HARD_CODED_PWD;
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(AUTH_TYPE, gen);
-        // editor.putInt(SALT, byteArrToInt(b));
-        editor.commit();
+
         enterButton.setOnClickListener(new View.OnClickListener() {
             
             @Override
@@ -74,7 +50,6 @@ public class PasswordAuthenticate extends Activity {
                 if (password == null) {
                     Log.e(ERROR_TAG, "Pw field is null");
                 }
-                Log.i(ERROR_TAG, "Pw field has this: " + password.getEditableText().toString());
                 boolean res = verifyPassword(password.getEditableText().toString());
                 Intent resultantIntent = new Intent();
                 resultantIntent.putExtra(IDENTIFIER, res);
@@ -102,36 +77,32 @@ public class PasswordAuthenticate extends Activity {
     }
     
     private boolean verifyPassword(String pwd) {
-        Log.i(ERROR_TAG, "In Verify Password!");
-        // Get hashed key
-        String result = prefs.getString(AUTH_TYPE, null);
-        if (result == null) {
-            Log.e(ERROR_TAG, "Not seeing a stored key");
-            return false;
-        }
-        Log.i(ERROR_TAG, "Fetching this guy: " + result);
-        // Get salt from storage
-        // byte[] salt = intToByteArr(prefs.getInt(SALT, -1));
-        String key = pwd;
-        // Attempt to hash supplied pwd with salt
-        /*
-        try {
-            key = generateKey(pwd.toCharArray(), salt);
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        }
-        */
-        // Checks whether stored result equals hashed supplied password
-        if (result.equals(key)) {
-            return true;
-        }
-        return false;
+    	Log.i(ERROR_TAG, "In Verify Password!");
+    	// Fetch hashed value
+    	String result = prefs.getString(AUTH_TYPE, null);
+    	if (result == null) {
+    		Log.e(ERROR_TAG, "Not seeing a stored key; This is an issue.");
+    		return false;
+    	}
+    	
+    	// Fetch salt from shared preferences
+    	byte[] salt = stringToByteArr(prefs.getString(AUTH_TYPE+"_SALT", null));
+    	String key;
+    	// Attempt to hash supplied password with salt
+    	try {
+			key = generateKey(pwd.toCharArray(), salt);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return false;
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+			return false;
+		}
+    	// Checks whether stored hash equals hashed supplied password
+    	if (result.equals(key)) {
+    		return true;
+    	}
+    	return false;
     }
     
     // Cryptographic hashing with salt
@@ -146,20 +117,20 @@ public class PasswordAuthenticate extends Activity {
         SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
         // Convert to a string for storage while maintaining consistency
         String result = Base64.encodeToString(secretKey.getEncoded(), Base64.DEFAULT);
-        Log.i(ERROR_TAG, "Generated this key result: " + result);
         return result;
     }
     
-    public static int byteArrToInt(byte[] b) {
-        ByteBuffer wrapped = ByteBuffer.wrap(b);
-        int i = wrapped.getInt();
-        return i;
+	// Will encode byteArray to String
+	public static String byteArrToString(byte[] b) {
+		String str = null;
+		str = new String(b);
+    	return str;
     }
     
-    public static byte[] intToByteArr(int i) {
-        ByteBuffer dbuf = ByteBuffer.allocate(SALT_LENGTH);
-        dbuf.putInt(i);
-        byte[] bytes = dbuf.array();
-        return bytes;
+	// Will decode String to byteArray
+    public static byte[] stringToByteArr(String s) {
+    	byte[] bytes = null;
+		bytes = s.getBytes();
+    	return bytes;
     }
 }
