@@ -14,7 +14,7 @@ public class PasscodeAuthentication extends Activity {
 	
 	public SharedPreferences prefs;
 	public static final String AUTH_TYPE = "Passcode";
-	public static final String HARD_CODED = "1234";
+	public static final String HARD_CODED = "6858";
 	public static final String ERROR_TAG = "PASSCODE";
 	public static final String IDENTIFIER = "com.example.passwordauth";
 

@@ -30,7 +30,7 @@ public class PasswordAuthenticate extends Activity {
     public static final String ERROR_TAG = "PASSWORD";
     public static final String IDENTIFIER = "com.example.passwordauth";
     public static final String HASH_ALGO = "PBKDF2WithHmacSHA1";
-    public static final String HARD_CODED_PWD = "pass";
+    public static final String HARD_CODED_PWD = "security";
     public static final int SALT_LENGTH = 20;
 
     @Override

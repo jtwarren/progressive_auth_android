@@ -60,9 +60,9 @@ public class ProgressiveAuthenticationActivity extends Activity {
 
     @Override
     public void onResume() {
-        super.onResume();  // Always call the superclass method first
+        super.onResume();
 
-        this.finish();
+        // this.finish();
     }
 
 
