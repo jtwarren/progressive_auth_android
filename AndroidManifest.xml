@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.progressiveauthentication">
+    package="com.android.progressiveauthentication"
+    android:versionCode="1"
+    android:versionName="test"
+    >
 
-        <uses-sdk
+<!--         <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="14" />
+        android:targetSdkVersion="18"
+        android:maxSdkVersion="19" /> -->
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
-
-    <uses-permission android:name="android.permission.ACCESS_PROGESSIVE_AUTHENTICATION_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_PROGESSIVE_AUTHENTICATION_SERVICE" />
     
     <application
         android:allowBackup="true"
@@ -43,20 +44,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service
-            android:name="com.android.progressiveauthentication.PublicAuthService"
-            android:process=":publicauthservice"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.progressiveauthentication.IPublicAuthServices" />
-            </intent-filter>
-		</service>
-		<service 
-		    android:name="com.android.progressiveauthentication.AuthService"
-            android:process=":authservice"
-            android:exported="false">
-		</service>
-		<receiver android:name="com.android.progressiveauthentication.BootCompletedReceiver" >
+		<receiver android:name="com.android.progressiveauthentication.BootCompletedReceiver">
 		    <intent-filter>
 		        <action android:name="android.intent.action.BOOT_COMPLETED" />
 		    </intent-filter>
@@ -64,17 +52,17 @@
 		<provider
             android:authorities="com.android.progressiveauthentication.contentprovider"
             android:multiprocess="true"
-            android:readPermission="com.progressiveauth.contentprovider.READ_PERMISSION"
-            android:writePermission="com.progressiveauth.contentprovider.WRITE_PERMISSION"
+            android:readPermission="com.android.progressiveauthentication.READ_PERMISSION"
+            android:writePermission="com.android.progressiveauthentication.WRITE_PERMISSION"
             android:name="AuthProvider" >
 		</provider> 
     </application>
 
-    <permission android:name="com.progressiveauth.contentprovider.WRITE_PERMISSION"
-    	android:protectionLevel="signature">
+    <permission android:name="com.android.progressiveauthentication.WRITE_PERMISSION"
+        android:protectionLevel="signature">
 	</permission>
 
-	<permission android:name="com.progressiveauth.contentprovider.READ_PERMISSION"
-	        	android:protectionLevel="signature">
+	<permission android:name="com.android.progressiveauthentication.READ_PERMISSION"
+        android:protectionLevel="signature">
 	</permission>
 </manifest>
