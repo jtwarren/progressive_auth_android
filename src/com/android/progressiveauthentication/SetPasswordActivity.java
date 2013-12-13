@@ -43,15 +43,22 @@ public class SetPasswordActivity extends Activity {
 				Log.i(ERROR_TAG, "Entered Click!");
 				EditText password = (EditText) findViewById(R.id.editText1);
 				if (password == null) {
-					Log.e(ERROR_TAG, "Pw field is null");
+					  Log.e(ERROR_TAG, "Pw field is null");
 				} else {
-				      ContentValues values = new ContentValues();
-				      values.put(AuthTable.COLUMN_PACKAGE, "com.android.mms");
-		     	      values.put(AuthTable.COLUMN_LEVEL, 1);
-		     	      Log.e("CONTENT",AuthProvider.CONTENT_URI.toString());
-		     	      Uri uri = getContentResolver().insert(AuthProvider.CONTENT_URI, values);
-		     	      Log.e("CONTENT","GOT Content Resolver");
-		     	      Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+			      ContentValues values = new ContentValues();
+			      values.put(AuthTable.COLUMN_PACKAGE, "com.android.mms");
+	     	    values.put(AuthTable.COLUMN_LEVEL, 1);
+	     	    Log.e("CONTENT",AuthProvider.CONTENT_URI.toString());
+	     	    Uri uri = getContentResolver().insert(AuthProvider.CONTENT_URI, values);
+
+            ContentValues values1 = new ContentValues();
+            values1.put(AuthTable.COLUMN_PACKAGE, "com.android.browser");
+            values1.put(AuthTable.COLUMN_LEVEL, 2);
+            Uri uri1 = getContentResolver().insert(AuthProvider.CONTENT_URI, values1);
+
+
+	     	    Log.e("CONTENT","GOT Content Resolver");
+	     	    Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
 				}
 				finish();
 			}
