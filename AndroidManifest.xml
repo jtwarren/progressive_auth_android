@@ -7,9 +7,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
-
-    <uses-permission android:name="android.permission.ACCESS_PROGESSIVE_AUTHENTICATION_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_PROGESSIVE_AUTHENTICATION_SERVICE" />
     
     <application
         android:allowBackup="true"

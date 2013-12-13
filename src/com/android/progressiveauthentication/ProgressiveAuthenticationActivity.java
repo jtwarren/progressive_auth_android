@@ -38,15 +38,24 @@ public class ProgressiveAuthenticationActivity extends Activity {
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.e("PROG_AUTH", "oncreate");
-        super.onCreate(savedInstanceState);
 
-        int level = 0;
+        super.onCreate(savedInstanceState);
 
 
         try {
             mIntent = Intent.getIntent(getIntent().getStringExtra("intent"));
-            level = getIntent().getIntExtra("level", 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        String packageName = mIntent.resolveActivity(getPackageManager()).getPackageName().toString();
+
+        int level = -1;
+
+
+        try {
+            level = om.getRequiredLevel(packageName);
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -62,10 +71,8 @@ public class ProgressiveAuthenticationActivity extends Activity {
           startActivityForResult(passwordIntent, PASSWORD_REQUEST);
         }
 
-
-        
-
     }
+
 
 
     @Override
@@ -77,7 +84,7 @@ public class ProgressiveAuthenticationActivity extends Activity {
             Log.e("PROG_AUTH", "result passed and auth - code");
             if (resultCode == RESULT_OK) {
               if (data.getBooleanExtra("auth", false)) {
-                Log.e("PROG_AUTH", "result passed and auth - code");
+                Log.e("PROG_AUTH", "result ok");
 
                 try {
                   om.updateAuthenticationLevel(1);
@@ -96,10 +103,10 @@ public class ProgressiveAuthenticationActivity extends Activity {
 
 
         if (requestCode == PASSWORD_REQUEST) {
-            Log.e("PROG_AUTH", "result passed and auth");
+            Log.e("PROG_AUTH", "result passed and auth - pw");
             if (resultCode == RESULT_OK) {
               if (data.getBooleanExtra("auth", false)) {
-                Log.e("PROG_AUTH", "result passed and auth");
+                Log.e("PROG_AUTH", "result ok");
 
                 try {
                   om.updateAuthenticationLevel(2);
