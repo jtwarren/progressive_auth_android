@@ -8,7 +8,7 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.android.internal.app.IAuthService;
+import com.android.progressiveauthentication.IAuthService;
 
 
 public class AuthService extends Service {
