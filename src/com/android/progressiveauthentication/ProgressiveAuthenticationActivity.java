@@ -24,10 +24,8 @@ import android.content.ServiceConnection;
 
 
 public class ProgressiveAuthenticationActivity extends Activity {
-
-	private static final String TAG = "PROG_AUTH";
-
-
+ 
+  private static final String TAG = "PROG_AUTH";
   private Intent mIntent;
   private int mCurrentLevel;
   private int mRequiredLevel = -1;
