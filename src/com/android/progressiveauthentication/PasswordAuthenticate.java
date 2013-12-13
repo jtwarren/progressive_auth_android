@@ -98,12 +98,12 @@ public class PasswordAuthenticate extends Activity {
 					Log.i(ERROR_TAG, "Passed password check!");
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra("auth", true);
-//                    setResult(Activity.RESULT_OK, resultIntent);
+                    setResult(Activity.RESULT_OK, resultIntent);
 				}
 				else {
 					Log.i(ERROR_TAG, "Failed password check!");
 				}
-//				finish();
+				finish();
 			}
 		});
     }
