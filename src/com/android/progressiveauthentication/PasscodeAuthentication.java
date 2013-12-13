@@ -57,7 +57,6 @@ public class PasscodeAuthentication extends Activity {
 				
 			}
 	    });
-	    // TODO Auto-generated method stub
 	}
 	
 	@SuppressWarnings("unused")

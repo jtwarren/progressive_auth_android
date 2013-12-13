@@ -1,12 +1,20 @@
 package com.android.progressiveauthentication;
 
+import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.util.Random;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -28,39 +36,47 @@ public class SetPasswordActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.i(ERROR_TAG, "intent string extra" + getIntent().getStringExtra("intent"));
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_password_authenticate);
+        setContentView(R.layout.activity_set_password);
+        
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        
         final Button enterButton = (Button) findViewById(R.id.button1);
-		
-        // String gen = HARD_CODED_PWD;
         enterButton.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				Log.i(ERROR_TAG, "Entered Click!");
-				EditText password = (EditText) findViewById(R.id.editText1);
-				if (password == null) {
-					  Log.e(ERROR_TAG, "Pw field is null");
+				String password = ((EditText) findViewById(R.id.password)).getEditableText().toString();
+				if (password == null || password.isEmpty()) {
+					Log.e(ERROR_TAG, "Pw field is null");
+					Toast toast = Toast.makeText(SetPasswordActivity.this, "password field is empty", Toast.LENGTH_SHORT);
+					toast.show();
 				} else {
-			      ContentValues values = new ContentValues();
-			      values.put(AuthTable.COLUMN_PACKAGE, "com.android.mms");
-	     	    values.put(AuthTable.COLUMN_LEVEL, 1);
-	     	    Log.e("CONTENT",AuthProvider.CONTENT_URI.toString());
-	     	    Uri uri = getContentResolver().insert(AuthProvider.CONTENT_URI, values);
+					
+			        // Generate a random salt of length 20
+			        byte[] salt = new byte[SALT_LENGTH];
+			        new Random().nextBytes(salt);
+			        String gen = null;
+			        
+					try {
+						gen = generateKey(password.toCharArray(), salt);
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+						gen = HARD_CODED_PWD;
+				        salt = new byte[SALT_LENGTH];
+					} catch (InvalidKeySpecException e) {
+						e.printStackTrace();
+						gen = HARD_CODED_PWD;
+				        salt = new byte[SALT_LENGTH];
+					}
 
-            ContentValues values1 = new ContentValues();
-            values1.put(AuthTable.COLUMN_PACKAGE, "com.android.browser");
-            values1.put(AuthTable.COLUMN_LEVEL, 2);
-            Uri uri1 = getContentResolver().insert(AuthProvider.CONTENT_URI, values1);
-
-
-	     	    Log.e("CONTENT","GOT Content Resolver");
-	     	    Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+			        SharedPreferences.Editor editor = prefs.edit();
+			        editor.putString(AUTH_TYPE, gen);
+			        editor.putInt(AUTH_TYPE + "_SALT", byteArrToInt(salt));
+			        editor.commit();;
+					finish();
 				}
-				finish();
 			}
 		});
     }
@@ -72,24 +88,34 @@ public class SetPasswordActivity extends Activity {
         getMenuInflater().inflate(R.menu.progressive_authetication, menu);
         return true;
     }
-
     
-    public void readFromCursor() {
-        // Retrieve student records
-        Uri auth = AuthProvider.CONTENT_URI;
-        Cursor c = managedQuery(auth, null, null, null, null);
-        if (c.moveToFirst()) {
-           do{
-        	  Log.e("CONTENT",  c.getString(c.getColumnIndex(AuthTable.COLUMN_ID)) + 
-              ", " +  c.getString(c.getColumnIndex( AuthTable.COLUMN_PACKAGE)) + 
-              ", " + c.getString(c.getColumnIndex( AuthTable.COLUMN_LEVEL)));
-              Toast.makeText(this, 
-              c.getString(c.getColumnIndex(AuthTable.COLUMN_ID)) + 
-              ", " +  c.getString(c.getColumnIndex( AuthTable.COLUMN_PACKAGE)) + 
-              ", " + c.getString(c.getColumnIndex( AuthTable.COLUMN_LEVEL)), 
-              Toast.LENGTH_SHORT).show();
-           } while (c.moveToNext());
-        }
-     }
+    // Cryptographic hashing with salt
+	private static String generateKey(char[] pwd, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        final int iterations = 1000; 
+
+        // Generate a 256-bit key
+        final int outputKeyLength = 256;
+
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(HASH_ALGO);
+        KeySpec keySpec = new PBEKeySpec(pwd, salt, iterations, outputKeyLength);
+        SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
+        // Convert to a string for storage while maintaining consistency
+        String result = Base64.encodeToString(secretKey.getEncoded(), Base64.DEFAULT);
+        Log.i(ERROR_TAG, "Generated this key result: " + result);
+        return result;
+    }
+    
+    public static int byteArrToInt(byte[] b) {
+    	ByteBuffer wrapped = ByteBuffer.wrap(b);
+    	int i = wrapped.getInt();
+    	return i;
+    }
+    
+    public static byte[] intToByteArr(int i) {
+    	ByteBuffer dbuf = ByteBuffer.allocate(SALT_LENGTH);
+    	dbuf.putInt(i);
+    	byte[] bytes = dbuf.array();
+    	return bytes;
+    }
 
 }
